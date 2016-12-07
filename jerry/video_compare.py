@@ -161,7 +161,7 @@ def align(video1, video2, dir, fft_bin_size=1024, overlap=0, box_height=512, box
 # audio2 = "Settle2d_tj-9_dGog.mp4"
 audio1 = "0KRt1FCSpIQ.mp4"
 audio2 = "9yjAFMNkCDo.mp4"
-directory = "./uploads/"
+directory = "./"
 t = align(audio1, audio2, directory)
 print t
 

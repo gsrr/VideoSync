@@ -1,4 +1,8 @@
 Package:
+0.1 pip install sqlalchemy
+0.2 pip install flask
+0.3 pip install envoy
+0.4 pip install scipy
 1. install bootstrap
 2. pip install youtube-dl
 3. yum -y install http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
