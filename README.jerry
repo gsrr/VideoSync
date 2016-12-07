@@ -1,0 +1,26 @@
+Package:
+1. install bootstrap
+2. pip install youtube-dl
+3. yum -y install http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
+4. yum install ffmpeg
+5. pip install moviepy
+6. install avconv
+    6.1 yum install libvorbis  yasm freetype zlib bzip2 faac lame speex libvpx libogg  libtheora  x264 XviD openjpeg15 opencore-amr
+    6.2 wget http://libav.org/releases/libav-10.1.tar.gz
+    6.3 tar -xvzf libav-10.1.tar.gz
+    6.4 cd libav-10.1
+    6.5 ./configure
+    6.6 make & make install
+
+
+code:
+    1. 將layout.html裡面的playAll 與 pauseAll取消disable
+
+Video:
+    up
+    1. https://www.youtube.com/watch?v=0KRt1FCSpIQ
+    2. https://www.youtube.com/watch?v=9yjAFMNkCDo
+    ppap
+    1. https://www.youtube.com/watch?v=kN5cqf63kb8
+    2. https://www.youtube.com/watch?v=HFlgNoUsr4k
+
