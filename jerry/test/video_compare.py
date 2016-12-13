@@ -5,6 +5,7 @@ import math
 import sys
 import time
 import movie_split
+import os
 
 
 # Extract audio from video file, save as wav auido file
@@ -128,19 +129,19 @@ def find_delay(time_pairs):
 
 
 # Find time delay between two video files
-def align(wavfile1, wavfile2, dir, fft_bin_size=1024, overlap=0, box_height=512, box_width=43, samples_per_box=7):
+def align(wavfile1, wavfile2, offset1, offset2, fft_bin_size=1024, overlap=0, box_height=512, box_width=43, samples_per_box=7):
     # Process first file
     #wavfile1 = extract_audio(dir, video1)
     raw_audio1, rate = read_audio(wavfile1)
     raw_audio1 = raw_audio1.flatten()
-    bins_dict1 = make_horiz_bins(wavfile1, raw_audio1[:44100*120], fft_bin_size, overlap, box_height) #bins, overlap, box height
+    bins_dict1 = make_horiz_bins(wavfile1, raw_audio1[44100*offset1:44100*120], fft_bin_size, overlap, box_height) #bins, overlap, box height
     boxes1 = make_vert_bins(bins_dict1, box_width)  # box width
     ft_dict1 = find_bin_max(boxes1, samples_per_box)  # samples per box
 
     # Process second file
     raw_audio2, rate = read_audio(wavfile2)
     raw_audio2 = raw_audio2.flatten()
-    bins_dict2 = make_horiz_bins(wavfile2, raw_audio2[:44100*120], fft_bin_size, overlap, box_height)
+    bins_dict2 = make_horiz_bins(wavfile2, raw_audio2[44100*offset2:44100*120], fft_bin_size, overlap, box_height)
     boxes2 = make_vert_bins(bins_dict2, box_width)
     ft_dict2 = find_bin_max(boxes2, samples_per_box)
 
@@ -173,42 +174,47 @@ def start():
     audio2 = extract_audio(video2)
     duration1 = movie_split.get_video_duration(audio1)
     duration2 = movie_split.get_video_duration(audio2)
+    offset1 = 0
+    offset2 = 0
     cnt = 0
-    while duration1 > 0 and  duration2 > 0:
+    ret = []
+    while duration1 > 10 and  duration2 > 10:
         directory = "./"
-        tmp_d1 = movie_split.get_video_duration(audio1)
-        tmp_d2 = movie_split.get_video_duration(audio2)
-        print "align audio file:",audio1, tmp_d1, audio2, tmp_d2
-        if tmp_d1 > tmp_d2:
-            t = align(audio1, audio2, directory)
+        print "align audio file:",audio1, duration1, audio2, duration2
+        if duration1 > duration2:
+            t = align(audio1, audio2, offset1, offset2 )
         else:
-            t = align(audio2, audio1, directory)
+            t = align(audio2, audio1, offset2, offset1)
             t = (t[1], t[0])
-        print t
         if t[0] == None and t[1] > 1:
             print "cut_fir_audio..."
-            if t[1] > tmp_d1:
-                t = (0, tmp_d1)
-            audio1 = cut_fir_movie(audio1, (0, t[1]), cnt)
+            if t[1] > duration1:
+                t = (0, duration1)
             duration1 -= t[1]
+            offset1 += t[1]
+            ret.append((1,t[1]))
         elif t[1] == None and t[0] > 1:
             print "cut_sec_audio..."
-            if t[0] > tmp_d2:
-                t = (tmp_d2, 0)
-            audio2 = cut_sec_movie(audio2, (0, t[0]), cnt)
+            if t[0] > duration2:
+                t = (duration2, 0)
             duration2 -= t[0]
+            offset2 += t[0]
+            ret.append((2,t[0]))
         else:
             print "cut_both_audio..."
-            audio1, audio2 = cut_both_movie(audio1, audio2, (0,10), cnt)
             duration1 -= 10
             duration2 -= 10
+            offset1 += 10
+            offset2 += 10
+            ret.append(("both",10))
         cnt += 1
+        print ret
 
-    if duration1 > 0 :
-        os.system("cp %s files/audio_part_%d"%(audio1,cnt))
-        
-    if duration2 > 0 :
-        os.system("cp %s files/audio_part_%d"%(audio2,cnt))
+    if duration1 > duration2 :
+        ret.append((1, duration1))
+    else:
+        ret.append((2, duration1))
+    print ret 
         
 def main():
     fft_bin_size=1024
