@@ -64,6 +64,13 @@ def split_audio_with_reminder(name, interval, index):
             subclip2.write_audiofile(next_name, fps=22050)
         return next_name
 
+
+def audio_moviepy_convert(audio_file, index):
+    name = "audio%d.wav"%index
+    clip = AudioFileClip(audio_file)
+    clip.write_audiofile(name, fps=22050)
+    return name
+
 def split_wav_file():
     clip = AudioFileClip("video124WAV.wav")
     print clip.duration
@@ -77,8 +84,25 @@ def split_video_test():
     i = int(sys.argv[3])     # index
     split_with_reminder(video, (start, end), i)
     
+def splitAll(time_list):
+    new_time_list = [0]
+    for item in time_list:
+        if 
+    cur_index = 0
+    for i in xrange(len(time_list)):
+        if time_list[i][0] == 'both':
+            time_list[cur_index][1] += time_list[i][1]
+        else:
+            cur_index = i
+    print time_list
+            
+
+def test_splitAll():
+    time_list = eval("[[1, 59.0483], ['both', 10], ['both', 10], ['both', 10], ['both', 10], ['both', 10], ['both', 10], [2, 11.9815], [2, 47.0668], ['both', 10], ['both', 10], ['both', 10], ['both', 10], ['both', 10], [2, 8.111699999999999]]")
+    splitAll(time_list)
+
 def main():
-    split_wav_file()
+    test_splitAll()
 
 
 if __name__ == "__main__":

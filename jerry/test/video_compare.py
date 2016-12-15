@@ -122,9 +122,10 @@ def find_delay(time_pairs):
         else:
             t_diffs[delta_t] = 1
     t_diffs_sorted = sorted(t_diffs.items(), key=lambda x: x[1])
-    print t_diffs_sorted
+    #print t_diffs_sorted
     if len(t_diffs_sorted) != 0:
         time_delay = t_diffs_sorted[-1][0]
+        print t_diffs_sorted[-1][0] , t_diffs_sorted[-1][-1]
     else:
         time_delay = 0
     return time_delay
@@ -135,15 +136,18 @@ def align(wavfile1, wavfile2, offset1, offset2, fft_bin_size=1024, overlap=0, bo
     # Process first file
     #wavfile1 = extract_audio(dir, video1)
     raw_audio1, rate = read_audio(wavfile1)
-    raw_audio1 = raw_audio1.flatten()
-    bins_dict1 = make_horiz_bins(wavfile1, raw_audio1[44100*offset1:44100*120], fft_bin_size, overlap, box_height) #bins, overlap, box height
+    base1 = rate * offset1
+    base2 = rate * offset2
+    #raw_audio1 = raw_audio1.flatten()
+    print len(raw_audio1), rate
+    bins_dict1 = make_horiz_bins(wavfile1, raw_audio1[base1: base1 + rate*120], fft_bin_size, overlap, box_height) #bins, overlap, box height
     boxes1 = make_vert_bins(bins_dict1, box_width)  # box width
     ft_dict1 = find_bin_max(boxes1, samples_per_box)  # samples per box
 
     # Process second file
     raw_audio2, rate = read_audio(wavfile2)
-    raw_audio2 = raw_audio2.flatten()
-    bins_dict2 = make_horiz_bins(wavfile2, raw_audio2[44100*offset2:44100*120], fft_bin_size, overlap, box_height)
+    #raw_audio2 = raw_audio2.flatten()
+    bins_dict2 = make_horiz_bins(wavfile2, raw_audio2[base2: base2 + rate*60], fft_bin_size, overlap, box_height)
     boxes2 = make_vert_bins(bins_dict2, box_width)
     ft_dict2 = find_bin_max(boxes2, samples_per_box)
 
@@ -182,12 +186,14 @@ def start():
     ret = []
     while duration1 > 10 and  duration2 > 10:
         directory = "./"
-        print "align audio file:",audio1, duration1, audio2, duration2
-        if duration1 > duration2:
-            t = align(audio1, audio2, offset1, offset2 )
+        print "align audio file:",audio1, duration1, offset1, audio2, duration2, offset2
+        #if duration1 > duration2:
+        t = align(audio1, audio2, offset1, offset2 )
+        '''
         else:
             t = align(audio2, audio1, offset2, offset1)
             t = (t[1], t[0])
+        '''
         if t[0] == None and t[1] > 1:
             print "cut_fir_audio..."
             if t[1] > duration1:
@@ -216,7 +222,8 @@ def start():
         ret.append((1, duration1))
     else:
         ret.append((2, duration1))
-    print ret 
+
+    movie_split.splitAll(ret) 
         
 def main():
     fft_bin_size=1024
