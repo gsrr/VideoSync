@@ -84,22 +84,45 @@ def split_video_test():
     i = int(sys.argv[3])     # index
     split_with_reminder(video, (start, end), i)
     
-def splitAll(time_list):
-    new_time_list = [0]
+def splitAll(video1, video2, time_list):
+    split_list = []
+    cur_video = 0
+    time_video = [[0,0], [0,0]]
     for item in time_list:
-        if 
-    cur_index = 0
-    for i in xrange(len(time_list)):
-        if time_list[i][0] == 'both':
-            time_list[cur_index][1] += time_list[i][1]
+        if item[0] == 'both':
+            if cur_video == 0:
+                time_video[0][1] += item[1]
+                time_video[1][1] += item[1]
+            elif cur_video == 1:
+                time_video[0][1] += item[1]
+                time_video[1][0] += item[1]
+            elif cur_video == 2:
+                time_video[0][0] += item[1]
+                time_video[1][1] += item[1]
+                
+        elif item[0] == 1:
+            time_video[0][1] += item[1]
+            if cur_video == 2:
+                split_list.append((cur_video, time_video[cur_video-1]))
+            cur_video = 1
+        elif item[0] == 2:
+            time_video[1][1] += item[1]
+            if cur_video == 1:
+                split_list.append((cur_video, time_video[cur_video-1]))
+            cur_video = 2
+            
+    split_list.append((cur_video, time_video[cur_video-1]))
+    print split_list
+    for i in range(len(split_list)):
+        if item[0] == 1:
+            start_split(video1, item[1], i) 
         else:
-            cur_index = i
-    print time_list
+            start_split(video2, item[1], i) 
             
 
 def test_splitAll():
     time_list = eval("[[1, 59.0483], ['both', 10], ['both', 10], ['both', 10], ['both', 10], ['both', 10], ['both', 10], [2, 11.9815], [2, 47.0668], ['both', 10], ['both', 10], ['both', 10], ['both', 10], ['both', 10], [2, 8.111699999999999]]")
-    splitAll(time_list)
+    splitAll("p124WAV.wav", "p234WAV.wav", time_list)
 
 def main():
     test_splitAll()
